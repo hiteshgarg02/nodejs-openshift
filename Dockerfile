@@ -1,4 +1,4 @@
-FROM node:10.16-alpine
+FROM openshift/nodejs:latest
 MAINTAINER garghitesh@ibm.com
 EXPOSE 8080
 COPY .s2i/bin /usr/local/s2i
