@@ -6,4 +6,7 @@ RUN curl -sL https://rpm.nodesource.com/setup_6.x | bash - && \
 COPY .s2i/bin /usr/local/s2i
 
 LABEL io.openshift.s2i.scripts-url=image:///usr/local/s2i
-USER default
+RUN chown -R 1001:0 /opt/app-root
+USER 1001
+
+CMD ["echo", "This is output text from Dockerfile"]
