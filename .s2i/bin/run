@@ -1,1 +1,1 @@
-npm start
+cd /opt/app-root/src && npm start
