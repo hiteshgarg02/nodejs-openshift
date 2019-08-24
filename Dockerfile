@@ -9,4 +9,4 @@ LABEL io.openshift.s2i.scripts-url=image:///usr/local/s2i
 RUN chown -R 1001:0 /opt/app-root
 USER 1001
 
-CMD ["echo", "This is output text from Dockerfile"]
+CMD ["npm", "start"]
