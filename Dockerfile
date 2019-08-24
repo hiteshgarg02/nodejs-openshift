@@ -1,12 +1,7 @@
-FROM openshift/base-centos7
-MAINTAINER garghitesh@ibm.com
-EXPOSE 8080
-RUN curl -sL https://rpm.nodesource.com/setup_6.x | bash - && \
-    yum install nodejs -y  && yum clean all
-COPY .s2i/bin /usr/local/s2i
-
-LABEL io.openshift.s2i.scripts-url=image:///usr/local/s2i
-RUN chown -R 1001:0 /opt/app-root
-USER 1001
-
-CMD ["npm", "start"]
+FROM nodejs
+ENV PORT=3080
+EXPOSE 3080
+WORKDIR /app
+COPY . /app
+RUN npm install
+CMD [ "npm", "start"]
