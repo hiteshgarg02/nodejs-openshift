@@ -1,4 +1,4 @@
-FROM nodejs
+FROM openshift/origin-node
 ENV PORT=3080
 EXPOSE 3080
 WORKDIR /app
