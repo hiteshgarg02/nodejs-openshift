@@ -54,17 +54,17 @@ The purpose of this repo is to demonstrate how Minishift and OpenShift can be us
 `oc get all to see all the resources created. You will see application url under route.`  
 
 ## Update repository to trigger new build(s2i) and deployment automatically.
-To make call github hooks to your local environment, we use Ultrahook. With Ultrahook, github will be able to call your private endpoint.
-Signup for free and create your unique namespace. For step by step guide: https://blog.openshift.com/using-github-hooks-with-your-local-openshift-environment/
-After installing ultrahook and getting namespace, go to repository setting -> WebHooks & Services -> Add Webhook and add url as github.<your-namespace>.ultrahook.com.
-From the terminal use oc describe <buildConfig-name> to get the Webhook GitHub: Url
-Copy the url and run ultrahook github <copied-url>
-Update the registered branch or push any change, build and deployment will trigger automatically.
+* To make call github hooks to your local environment, we use Ultrahook. With Ultrahook, github will be able to call your private endpoint.
+* Signup for free and create your unique namespace. For step by step guide: https://blog.openshift.com/using-github-hooks-with-your-local-openshift-environment/
+* After installing ultrahook and getting namespace, go to repository setting -> WebHooks & Services -> Add Webhook and add url as github.<your-namespace>.ultrahook.com.
+* From the terminal use oc describe <buildConfig-name> to get the Webhook GitHub: Url
+* Copy the url and run ultrahook github <copied-url>
+* Update the registered branch or push any change, build and deployment will trigger automatically.
   
 ## Basic troubleshooting commands
-oc get events
-oc logs <podname>
-oc describe pod <podname>
-oc status
-oc projects
-oc delete all --all
+oc get events  
+oc logs <podname>  
+oc describe pod <podname>  
+oc status  
+oc projects  
+oc delete all --all  
