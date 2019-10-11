@@ -1,0 +1,25 @@
+{
+  "name": "openshift",
+  "version": "1.0.0",
+  "description": "This is demo app for openshift using minishift",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.ibm.com:garghitesh/nodejs_openshift_minishift.git"
+  },
+  "keywords": [
+    "openshift",
+    "minishift"
+  ],
+  "author": "Hitesh Garg",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.7.1",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.3"
+  }
+}

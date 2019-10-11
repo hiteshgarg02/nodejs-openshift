@@ -1,0 +1,187 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: node-app
+  annotations:
+    description: "This is template for node app"
+    iconClass: "fas fa-eye"
+    tags: "node"
+objects:
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: github-pat
+  type: kubernetes.io/basic-auth
+  stringData:
+    password: ${GITHUB_TOKEN}
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: node-app
+    name: node-app
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: '172.30.1.1:5000/${APP_NAME}/node-app:0.1'
+
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: node-app
+    name: node-app
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: 'node-app:0.1'
+    runPolicy: Serial
+    source:
+      contextDir: ${CONTEXT}
+      git:
+        uri: ${SOURCE_REPOSITORY_URL}
+      sourceSecret:
+        name: github-pat
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: 'nodejs:10'
+          namespace: openshift
+      type: Source
+    triggers:
+    - imageChange:
+      type: ImageChange
+    - type: ConfigChange  
+    - github:
+        secret: ${GITHUB_WEBHOOK_SECRET}
+      type: GitHub
+
+- apiVersion: v1
+  kind: ConfigMap
+  data:
+    DBURL: ${DBURL}
+    CLIENTID: ${CLIENTID}
+  metadata:
+    name: node-configmap
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: node-app
+    name: node-app
+  spec:
+    ports:
+      - name: 8080-tcp
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+    selector:
+      app: node-app
+      deploymentconfig: node-app
+    sessionAffinity: None
+    type: ClusterIP
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: node-app
+    name: node-app
+  spec:
+    replicas: 1
+    selector:
+      app: node-app
+      deploymentconfig: node-app
+    strategy:
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: node-app
+          deploymentconfig: node-app
+      spec:
+        containers:
+        - env:
+          - name: DBURL
+            valueFrom:
+              configMapKeyRef:
+                name: node-configmap
+                key: DBURL
+          - name: CLIENTID
+            valueFrom:
+              configMapKeyRef:
+                name: node-configmap
+                key: CLIENTID
+          image: 172.30.1.1:5000/${APP_NAME}/node-app:0.1
+          imagePullPolicy: Always
+          name: node-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+    triggers:
+      - type: ConfigChange
+      - imageChangeParams:
+          automatic: true
+          containerNames:
+            - node-app
+          from:
+            kind: ImageStreamTag
+            name: 'node-app:0.1'
+        type: ImageChange
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: node-app
+    name: node-app
+  spec:
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: node-app
+      weight: 100
+    wildcardPolicy: None
+parameters:
+  - name: APP_NAME 
+    displayName: PROJECT NAME 
+    description: Project Name
+    required: true 
+  - name: GITHUB_WEBHOOK_SECRET 
+    displayName: WebHook Secret 
+    description: Chose any random secert value
+    value: github-secret 
+    required: true     
+  - name: GITHUB_TOKEN
+    displayName: Github Token 
+    description: Add the token to access the node_openshift_minishift github repository
+    required: true
+  - name: CLIENTID 
+    displayName: W3 client id 
+    description: Add w3 client id to authenticate using w3  
+  - name: DBURL 
+    displayName: DB url
+  - name: SOURCE_REPOSITORY_URL 
+    displayName: Node Repository URL 
+    description: The URL of the repository with your application source code 
+    required: true  
+  - name: CONTEXT
+    displayName: Context
+    value: app 
+message: "... To add github webhook use oc describe <buildConfig> or under builds config. The application is running now"

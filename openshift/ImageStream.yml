@@ -1,0 +1,14 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: node-app
+  name: node-app
+  namespace: node-app
+spec:
+  lookupPolicy:
+    local: false
+status:
+  dockerImageRepository: '172.30.1.1:5000/node-app/node-openshiftst:0.1'
+
+
